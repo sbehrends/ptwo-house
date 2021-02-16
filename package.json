@@ -1,0 +1,27 @@
+{
+  "name": "ptwo-house",
+  "version": "0.1.0",
+  "description": "Full power of WebRTC to create voice rooms to have a conversations, interviews and discussions",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "author": "Sergio Behrends <sergio@behrends.com.ar>",
+  "license": "MIT",
+  "dependencies": {
+    "classcat": "^4.1.0",
+    "hark": "^1.2.3",
+    "next": "^10.0.6",
+    "peerjs": "^1.3.1",
+    "react": "^17.0.1",
+    "react-copy-to-clipboard": "^5.0.3",
+    "react-dom": "^17.0.1",
+    "react-icons": "^4.2.0",
+    "react-share": "^4.3.1",
+    "string-to-color": "^2.2.2",
+    "uuid-random": "^1.3.2"
+  }
+}
