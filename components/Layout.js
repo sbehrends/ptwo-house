@@ -20,21 +20,24 @@ export default function Layout ({ children }) {
           border-radius: 14px;
         }
       `}</style>
-      <style global jsx>{`
-        :root {
-          --active-color: #fefffe;
-          --dark-bg: #14162b;
-        }
-        body {
-          background: #355c7d; /* fallback for old browsers */
-          background: -webkit-linear-gradient(to right, #355c7d, #6c5b7b, #c06c84); /* Chrome 10-25, Safari 5.1-6 */
-          background: linear-gradient(to right, #355c7d, #6c5b7b, #c06c84); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-          color: var(--active-color);
-        }
-        * {
-          box-sizing: border-box;
-        }
-      `}</style>
+      <style jsx global>{`
+          :root {
+            --active-color: #fefffe;
+            --dark-bg: #14162b;
+          }
+
+          body {
+            font-family: 'Poppins', sans-serif;
+            background: #355c7d;
+            background: -webkit-linear-gradient(to right, #355c7d, #6c5b7b, #c06c84);
+            background: linear-gradient(to right, #355c7d, #6c5b7b, #c06c84);
+            color: var(--active-color);
+          }
+
+          * {
+            box-sizing: border-box;
+          }
+        `}</style>
     </div>
   )
 }

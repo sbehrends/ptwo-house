@@ -17,18 +17,6 @@ class MyDocument extends Document {
           <Main />
           <NextScript />
         </body>
-        <style jsx global>{`
-          html,
-          body {
-            padding: 0;
-            margin: 0;
-            font-family: 'Poppins', sans-serif;
-          }
-
-          * {
-            box-sizing: border-box;
-          }
-        `}</style>
       </Html>
     )
   }
