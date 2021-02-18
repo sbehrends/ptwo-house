@@ -3,7 +3,7 @@ import { PeerContext } from '../contexts/PeerContext'
 
 import User from './User'
 
-export default function StreamPlayer({ hostId }) {
+export default function StreamPlayer() {
   const { peer, incomingStreams, peerConnError } = useContext(PeerContext)
   const [streams, setStreams] = useState([])
   const playerEl = useRef([])

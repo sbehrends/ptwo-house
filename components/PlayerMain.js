@@ -40,6 +40,7 @@ function Main ({ roomId, roomName, userName, isHost }) {
   const {
     peerConnError,
     roomName: PeerRoomName,
+    connRole,
   } = useContext(PeerContext)
   
   const shareLink = typeof window === 'undefined' ? '' : `${window.location.protocol || ''}//${window.location.host || ''}/room/${roomId}`
@@ -82,11 +83,11 @@ function Main ({ roomId, roomName, userName, isHost }) {
         <Heading size={2}>Speaker</Heading>
       </Container>
       { isHost && <Streamer userName={userName} />}
-      { !isHost && <StreamPlayer hostId={roomId} />}
+      <StreamPlayer />
       <ConnectedPeersList shareLink={isHost ? shareLink : null} />
       <ActionGroup>
         <Button outline contrast onClick={onLeave}>Leave</Button>
-        { isHost && (
+        { (isHost || connRole === 'speaker') && (
           <Button style={{marginLeft:10}} contrast onClick={muteToggle}>
             { micMuted && <FiMic/>}
             { !micMuted && <FiMicOff/>}

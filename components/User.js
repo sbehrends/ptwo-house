@@ -13,7 +13,7 @@ const getInitials = function (string) {
   return initials
 }
 
-export default function User ({ stream, name }) {
+export default function User ({ stream, name, highlight, ...props }) {
   const [speaking, setSpeaking] = useState(false)
 
   useEffect(() => {
@@ -25,8 +25,8 @@ export default function User ({ stream, name }) {
   }, [stream])
   
   return (
-    <div className="User">
-      <div className={cc({ speaking, avatar: true })} style={{backgroundColor: stc(name)}}>
+    <div className="User" {...props}>
+      <div className={cc([{ speaking, highlight }, 'avatar'])} style={{backgroundColor: stc(name)}}>
         <span>
           {getInitials(name)}
         </span>
@@ -63,6 +63,10 @@ export default function User ({ stream, name }) {
           text-transform: uppercase;
           position: relative;
           color: var(--active-color);
+        }
+        
+        .avatar.highlight {
+          box-shadow: 0 0px 0px 4px rgb(1 0 0 / 30%);
         }
 
         .avatar::after {

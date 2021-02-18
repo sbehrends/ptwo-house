@@ -13,9 +13,17 @@ import Container from './Container'
 export default function ConnectedPeersList({ shareLink }) {
   const {
     connectedPeers,
+    onPromotePeerToSpeaker,
+    isHost,
+    peerId,
   } = useContext(PeerContext)
 
   const shareMessage = `Join my Room with this link`
+
+  function handleUserClick(peer) {
+    if (!isHost) return
+    onPromotePeerToSpeaker(peer.peer)
+  }
 
   return (
     <>
@@ -26,7 +34,7 @@ export default function ConnectedPeersList({ shareLink }) {
       </Container>
       <div className="grid">
         { connectedPeers.map(peer => (
-          <User key={peer.peer} name={peer.metadata?.name || 'Anonym'} />
+          <User key={peer.peer} highlight={peer.peer === peerId} name={peer.metadata?.name || 'Anonym'} onClick={() => handleUserClick(peer)} />
         ))}
         <style jsx>{`
           .grid {

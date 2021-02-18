@@ -40,37 +40,104 @@ const PeerContextProvider = ({ children, initialContext }) => {
 
   const [roomName, setRoomName, roomNameRef] = useStateRef(initialRoomName)
   // Connected Streams (each call will be stored here)
-  const [incomingStreams, setIncomingStreams] = useState([])
+  const [incomingStreams, setIncomingStreams, incomingStreamsRef] = useStateRef([])
+
+  // PEER: Outgoing streams
+  const [outgoingStreams, setOutgoingStreams, outgoingStreamsRef] = useStateRef([])
+
+  // HOST/PEER: Connection role (host/speaker/listener)
+  // Host is always host and speaker
+  // Peer is listener by default, and can be promoted to speaker to talk
+  const [connRole, setConnRole, connRoleRef] = useStateRef('listener')
 
   // Connected users
   const [connectedPeers, setConnectedPeers, connectedPeersRef] = useStateRef([])
   
   // PeerJS Instance
-  const peerInstanceRef = useRef()
-  let peerInstance = peerInstanceRef.current
+  // const peerInstanceRef.current = useRef()
+  // let peerInstance = peerInstanceRef.current.current
+  const [peerInstance, setPeerInstance, peerInstanceRef] = useStateRef()
   const [peerConnError, setPeerConnError] = useState(null)
 
   const {
     startMicStream,
   } = useContext(StreamContext)
 
+  // TODO: Rename this function
+  // HOST/PEER: Start call to other connections
   async function onNewCall(peerId) {
+    console.log(`Start call to ${peerId}`)
     const stream = await startMicStream()
-    let call = peerInstance.call(peerId, stream, {
-      metadata: {
-        name: userName,
-        roomName: initialContext.roomName,
-      }
-    })
-    return call
+    try {
+      let call = peerInstanceRef.current.call(peerId, stream, {
+        metadata: {
+          name: userName,
+          roomName: initialContext.roomName,
+        }
+      })
+      
+      return call
+    } catch (err) {
+      console.log(err)
+    }
   }
 
+  // HOST: New peer. Keep track of current connections
   function onConnectedPeer(conn) {
     setConnectedPeers([...connectedPeersRef.current, conn])
   }
 
+  // HOST: Remove peer. Keep track of current connections
   function onDisconnectedPeer(conn) {
     return setConnectedPeers(connectedPeersRef.current.filter(peer => peer.peer !== conn.peer))
+  }
+
+  // HOST: Ask peer to be Speaker
+  function onPromotePeerToSpeaker(peerId) {
+    const willPromoteConn = connectedPeersRef.current.find(({peer}) => peer === peerId)
+    willPromoteConn.send({
+      action: 'promoteToSpeaker',
+    })
+  }
+
+  // PEER: Host want's this peer to be speaker
+  async function onPromtToPromotePeerToSpeaker() {
+    console.log('onPromtToPromotePeerToSpeaker')
+    setConnRole('speaker')
+  }
+
+  useEffect(() => {
+    startStreamToAllPeers()
+  }, [connRole])
+
+  function startStreamToAllPeers() {
+    // Start call to each listener
+    if (connRoleRef.current !== 'speaker') return
+    const peersShouldCall = [...connectedPeersRef.current, { peer: roomId }]
+      .map(peer => peer.peer) // Add room Host
+
+    // debugger;
+    const peersToCall = peersShouldCall
+      // Remove peers that are already being streamed
+      .filter(peer => !outgoingStreamsRef.current.includes(peer))
+      // Remove myself
+      .filter(peer => peer !== peerId)
+
+    peersToCall
+      .forEach((peer, i) => {
+        console.log(`PeerContext::Start call with ${peer}`)
+        onNewCall(peer)
+      })
+
+    setOutgoingStreams([...peersShouldCall])
+  }
+
+  // ALL: Remove speaker audio
+  function onSpeakerClosesStream (conn, e) {
+    // Remove call from list of speakers
+    // debugger;
+    setIncomingStreams(...incomingStreamsRef.current.filter(c => c.peer !== conn.peer))
+    // setIncomingStreams([...incomingStreamsRef.current, call])
   }
 
   useEffect(() => {
@@ -84,8 +151,13 @@ const PeerContextProvider = ({ children, initialContext }) => {
     })
   }, [connectedPeers])
 
+  useEffect(() => {
+    if (isHost) return
+    startStreamToAllPeers()
+  }, [connectedPeers])
+
   function startRoom() {
-    console.log('Start room', peerInstance)
+    console.log('Start room', peerInstanceRef.current)
     let peer = initilizePeer(peerId)
 
     peer.on('open', (peerId) => {
@@ -106,6 +178,7 @@ const PeerContextProvider = ({ children, initialContext }) => {
             payload
           } = data
           if (action === 'connectedPeers') setConnectedPeers(payload)
+          if (action === 'promoteToSpeaker') onPromtToPromotePeerToSpeaker()
         })
       }
     })
@@ -132,9 +205,11 @@ const PeerContextProvider = ({ children, initialContext }) => {
         console.log(`PeerContext::Stablished peer connection ${conn.peer}`)
         onConnectedPeer(conn)
         onNewCall(conn.peer)
+
         conn.send({
           action: 'ping',
         })
+
         conn.send({
           action: 'roomMetadata',
           payload: {
@@ -147,12 +222,13 @@ const PeerContextProvider = ({ children, initialContext }) => {
 
     peer.on('call', call => {
       // Connected Streams (each call will be stored here)
-      setIncomingStreams([...incomingStreams, call])
+      setIncomingStreams([...incomingStreamsRef.current, call])
       setRoomName(call.metadata.roomName || '')
+      call.on('close', (e) => { onSpeakerClosesStream(call, e)})
+      call.on('error', (e) => { onSpeakerClosesStream(call, e)})
     })
 
-    // setPeerInstance(peer)
-    peerInstance = peer
+    setPeerInstance(peer)
     return peer
   }
 
@@ -167,20 +243,16 @@ const PeerContextProvider = ({ children, initialContext }) => {
     }
   }, [])
 
-  useEffect(() => {
-    console.log('New connectedPeers', connectedPeers)
-  }, [connectedPeers])
-
-  function addPeer(peer) {
-    setConnectedPeers([...connectedPeers, peer])
-  }
-
   return (
     <PeerContext.Provider value={{
       peerConnError,
       incomingStreams,
       connectedPeers,
       roomName,
+      onPromotePeerToSpeaker,
+      isHost,
+      peerId,
+      connRole,
     }}>
       {children}
     </PeerContext.Provider>
