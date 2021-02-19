@@ -41,6 +41,7 @@ function Main ({ roomId, roomName, userName, isHost }) {
     peerConnError,
     roomName: PeerRoomName,
     connRole,
+    peerStatus,
   } = useContext(PeerContext)
   
   const shareLink = typeof window === 'undefined' ? '' : `${window.location.protocol || ''}//${window.location.host || ''}/room/${roomId}`
@@ -76,13 +77,14 @@ function Main ({ roomId, roomName, userName, isHost }) {
   return (
     <>
       <Container>
+        {peerStatus}
         <Heading>
           {/* {roomName} */}
           {PeerRoomName}
         </Heading>
         <Heading size={2}>Speaker</Heading>
       </Container>
-      { isHost && <Streamer userName={userName} />}
+      {/* { isHost && <Streamer userName={userName} />} */}
       <StreamPlayer />
       <ConnectedPeersList shareLink={isHost ? shareLink : null} />
       <ActionGroup>

@@ -1,6 +1,7 @@
 import { useContext } from 'react'
 
 import { RiWhatsappLine, RiTelegramLine, RiLinksFill } from 'react-icons/ri'
+import { FiX, FiPlus } from 'react-icons/fi'
 import { WhatsappShareButton, TelegramShareButton } from 'react-share'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 
@@ -16,7 +17,14 @@ export default function ConnectedPeersList({ shareLink }) {
     onPromotePeerToSpeaker,
     isHost,
     peerId,
+    incomingStreams,
+    incomingStreamsObj,
+    connRole,
   } = useContext(PeerContext)
+
+  const listenersPeers = connectedPeers
+    .filter(peer => !incomingStreamsObj.map(peer => peer.call.peer).includes(peer.peer))
+    .filter(peer => !(connRole === 'speaker' && peer.peer === peerId))
 
   const shareMessage = `Join my Room with this link`
 
@@ -29,12 +37,18 @@ export default function ConnectedPeersList({ shareLink }) {
     <>
       <Container>
         <Heading size={2}>
-          Listeners ({connectedPeers.length})
+          Listeners ({listenersPeers.length})
         </Heading>
       </Container>
       <div className="grid">
-        { connectedPeers.map(peer => (
-          <User key={peer.peer} highlight={peer.peer === peerId} name={peer.metadata?.name || 'Anonym'} onClick={() => handleUserClick(peer)} />
+        { listenersPeers.map(peer => (
+          <User
+            key={peer.peer}
+            me={peer.peer === peerId}
+            name={peer.metadata?.name || 'Anonym'}
+            onClick={isHost ? () => handleUserClick(peer) : null}
+            hoverIcon={<FiPlus/>}
+          />
         ))}
         <style jsx>{`
           .grid {
