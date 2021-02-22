@@ -2,10 +2,14 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import uuid from 'uuid-random'
 
+import { FiX, FiPhoneIncoming, FiPlus } from 'react-icons/fi'
+
 import Layout from '../components/Layout'
 import Button from '../components/Button'
 import Input from '../components/Input'
 import Heading from '../components/Heading'
+
+import User from '../components/User'
 
 export default function Index () {
   const router = useRouter()
