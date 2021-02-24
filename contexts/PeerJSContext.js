@@ -122,12 +122,26 @@ export const PeerContextProvider = ({ children, initialContext }) => {
       audio: true
     })
 
-    peer.call(peerId, stream, {
+    const call = await peer.call(peerId, stream, {
       metadata: {
         user,
       }
     })
+    // TODO: This is not executing on error
+    call.on('close', (call) => {
+      console.log('Peer closed call', call)
+      // closedStreamToPeer(call)
+    })
+    call.on('error', (call) => {
+      console.log('Peer Error call', call);
+      // closedStreamToPeer(call)
+    })
     setOutgoingStreams([...outgoingStreamsRef.current, call])
+  }
+
+  function closedStreamToPeer(conn) {
+    // When peer closes connection to streaming speaker
+    setOutgoingStreams([...incomingStreamsRef.current.filter(c => c.peer !== conn.peer)])
   }
 
    // HOST: Ask peer to be Speaker
@@ -173,6 +187,8 @@ export const PeerContextProvider = ({ children, initialContext }) => {
       conn.on('open', () => {
         console.log(`peerContext::Stablished peer connection ${conn.peer}`)
         setConnectedPeers([...connectedPeersRef.current, conn])
+        // Auto start stream to peer
+        startStreamToPeer(conn.peer)
       })
     })
 
@@ -225,6 +241,7 @@ export const PeerContextProvider = ({ children, initialContext }) => {
       connectedPeers,
       peersOnRoom,
       incomingStreams,
+      outgoingStreams,
       isHost,
       reconnectToHost,
     }}>
