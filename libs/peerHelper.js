@@ -4,7 +4,9 @@ export function mapPeersData(peers) {
   return peers.map(peer => ({
     peer: peer.peer,
     metadata: {
-      name: peer.metadata.name || 'Anonym',
+      user: {
+        name: peer.metadata?.user?.name || 'Anonym',
+      },
       isSpeaker: false,
     }
   }))

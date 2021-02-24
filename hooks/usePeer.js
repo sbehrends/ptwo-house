@@ -2,8 +2,6 @@ import { useEffect, useState } from 'react'
 import uuid from 'uuid-random'
 import Peer from 'peerjs'
 
-import useStateRef from '../libs/useStateRef'
-
 export default function usePeer(config = {}) {
   const {
     peerId: paramPeerId,
@@ -13,8 +11,6 @@ export default function usePeer(config = {}) {
   const [peerInstance, setPeerInstance] = useState(null)
   const [peerStatus, setPeerStatus] = useState()
   const [peerId, setPeerId] = useState(null)
-
-  const [connectedPeers, setConnectedPeers, connectedPeersRef] = useStateRef([])
 
   const destroyPeerInstance = () => {
     if (!peerInstance) return
@@ -31,27 +27,7 @@ export default function usePeer(config = {}) {
       setPeerInstance(peer)
       setPeerId(peer.id)
       setPeerStatus('open')
-    })
-
-    peer.on('connection', (conn) => {
-      console.log(`usePeer::Incoming peer connection ${conn.peer}`)
-
-      conn.on('data', (data) => {
-        console.log(`usePeer::Incoming peer data ${conn.peer}`, data)
-      })
-
-      conn.on('close', () => {
-        console.log(`usePeer::Closed peer connection ${conn.peer}`)
-      })
-
-      conn.on('open', () => {
-        console.log(`usePeer::Stablished peer connection ${conn.peer}`)
-        setConnectedPeers([...connectedPeersRef.current, conn])
-      })
-    })
-
-    peer.on('call', call => {
-      console.log('Received call', call)
+      onConnectionOpen?.(peer)
     })
 
     peer.on('disconnected', () => {
@@ -66,6 +42,7 @@ export default function usePeer(config = {}) {
       setPeerStatus('close')
     })
 
+
     peer.on('error', (error) => {
       console.log('usePeer::Peer error', error)
       setPeerStatus('error')
@@ -77,6 +54,6 @@ export default function usePeer(config = {}) {
     }
   }, [])
 
-  return [peerInstance, peerId, peerStatus, connectedPeers]
+  return [peerInstance, peerId, peerStatus]
 
 }
