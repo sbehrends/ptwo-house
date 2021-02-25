@@ -25,7 +25,7 @@ export default function User ({ host, onClick, hoverIcon, reaction, muted, me, s
     speechEvents.on('speaking', () => setSpeaking(true))
     speechEvents.on('stopped_speaking', () => setSpeaking(false))
   }, [stream])
-  
+
   return (
     <div className="User" {...props}>
       <div className={cc([{ speaking, highlight }, 'avatar'])} style={{backgroundColor: stc(name)}} onClick={onClick}>

@@ -1,6 +1,6 @@
 import { useEffect, createContext, useState, useContext, useRef, useMemo } from 'react'
 
-// import { StreamContext } from '../contexts/StreamContext'
+import { StreamContext } from '../contexts/StreamContext'
 // import useStateRef from '../libs/useStateRef'
 import { mapPeersData } from '../libs/peerHelper'
 
@@ -22,6 +22,10 @@ export const PeerContextProvider = ({ children, initialContext }) => {
     user,
     isHost,
   } = initialContext
+
+  const {
+    startMicStream,
+  } = useContext(StreamContext)
 
   const [peerListenersInitialized, setPeerListenersInitialized] = useState(false)
 
@@ -186,9 +190,7 @@ export const PeerContextProvider = ({ children, initialContext }) => {
 
   async function startStreamToPeer(peerId) {
     log(`Start Stream to ${peerId}`)
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: true
-    })
+    const stream = await startMicStream()
 
     const call = peer.call(peerId, stream, {
       metadata: {
@@ -212,7 +214,7 @@ export const PeerContextProvider = ({ children, initialContext }) => {
     // This is not being executed
     // When peer closes connection to streaming speaker
     call.close()
-    setOutgoingStreams([...incomingStreamsRef.current.filter(c => c.peer !== call.peer)])
+    setOutgoingStreams([...outgoingStreamsRef.current.filter(c => c.peer !== call.peer)])
   }
 
    // HOST: Ask peer to be Speaker

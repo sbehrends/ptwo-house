@@ -31,16 +31,10 @@ export default function Index () {
   }
 
   useEffect(() => {
-    navigator.permissions.query(
+    navigator.permissions?.query(
       { name: 'microphone' }
     ).then(function(permissionStatus){
-    
-        console.log(permissionStatus.state); // granted, denied, prompt
         setMicAccess(permissionStatus.state)
-    
-        permissionStatus.onchange = function(){
-            console.log("Permission changed to " + this.state);
-        }
     })
   }, [])
 
