@@ -28,9 +28,9 @@ export default function PlayerMain ({ roomId, roomName, userName, isHost }) {
           title: roomName,
         },
       }}>
-        <Main user={{user: {
+        <Main user={{
           name: userName,
-        }}} />
+        }} />
       </PeerContextProvider>
     </StreamContextProvider>
   )
