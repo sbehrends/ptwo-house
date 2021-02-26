@@ -1,4 +1,5 @@
 import { useEffect, createContext, useState, useContext, useRef, useMemo } from 'react'
+import uuid from 'uuid-random'
 
 import { StreamContext } from '../contexts/StreamContext'
 // import useStateRef from '../libs/useStateRef'
@@ -53,6 +54,7 @@ export const PeerContextProvider = ({ children, initialContext }) => {
   const [outgoingStreams, setOutgoingStreams, outgoingStreamsRef] = useStateRef([])
 
   const [roomMetadata, setRoomMetadata, roomMetadataRef] = useStateRef(initialRoomMetadata)
+  const [roomEvents, setRoomEvents, roomEventsRef] = useStateRef([])
 
   function resetState() {
     setOutgoingStreams([])
@@ -82,7 +84,8 @@ export const PeerContextProvider = ({ children, initialContext }) => {
     const conn = peer.connect(roomId, {
       metadata: {
         user,
-      }
+      },
+      serialization: 'json',
     })
     setPeerEvents(conn)
     setConnToHost(conn)
@@ -159,6 +162,10 @@ export const PeerContextProvider = ({ children, initialContext }) => {
       if (action === 'promoteToSpeaker') onPromtToPromotePeerToSpeaker()
       if (action === 'demoteToListener') onReqToDemotePeerToListener()
       if (action === 'roomMetadata') setRoomMetadata(payload)
+      if (action === 'event') {
+        console.log('Magic event', data)
+        setRoomEvents([...roomEventsRef.current, payload])
+      }
     })
   }
 
@@ -235,6 +242,23 @@ export const PeerContextProvider = ({ children, initialContext }) => {
     setSpeakers([...speakersRef.current].filter(p => p !== peerId))
   }
 
+  function onPeerSendReaction(conn, payload) {
+    const event = {
+      id: uuid(),
+      date: +new Date() / 1000,
+      peer: conn.peer,
+      eventName: 'reaction',
+      eventContent: payload,
+    }
+
+    broadcastMessage({
+      action: 'event',
+      payload: event,
+    })
+
+    setRoomEvents([...roomEventsRef.current, event])
+  }
+
   useEffect(() => {
     if (!peer) return
     if (peerListenersInitialized) return
@@ -250,7 +274,7 @@ export const PeerContextProvider = ({ children, initialContext }) => {
           payload
         } = data
         // TODO: Features to implement
-        // if (action === 'sendReaction') sendReaction(payload)
+        if (action === 'sendReaction') onPeerSendReaction(conn, payload)
         // if (action === 'sendQuestion') sendQuestion(payload)
       })
 
@@ -316,9 +340,13 @@ export const PeerContextProvider = ({ children, initialContext }) => {
   }, [peerList])
 
   const broadcastMessage = (content) => {
-    connectedPeers.forEach((conn, i) => {
+    connectedPeersRef.current.forEach((conn, i) => {
       conn.send(content)
     })
+  }
+
+  const sendMessageToHost = (content) => {
+    connToHost.send(content)
   }
 
   return (
@@ -335,6 +363,7 @@ export const PeerContextProvider = ({ children, initialContext }) => {
         connectedPeers,
         peersOnRoom,
         peerList,
+        roomEvents,
       },
       streams: {
         incomingStreams,
@@ -343,6 +372,7 @@ export const PeerContextProvider = ({ children, initialContext }) => {
       actions: {
         onPromotePeerToSpeaker,
         onDemotePeerToListener,
+        sendMessageToHost,
         // reconnectToHost,
       }
     }}>
