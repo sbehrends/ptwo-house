@@ -76,6 +76,7 @@ export default function StreamPlayer() {
             key={speaker?.peer}
             name={speaker?.metadata?.user?.name ? speaker.metadata.user.name : 'Anonym'}
             host={speaker?.metadata?.isHost}
+            me={speaker.peer === peerId}
             stream={speaker.stream}
             onClick={(connRole === 'host' && !speaker?.metadata?.isHost) ? () => {onDemotePeerToListener(speaker.peer)} : null }
             hoverIcon={<FiX/>}

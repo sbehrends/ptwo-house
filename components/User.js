@@ -40,8 +40,8 @@ export default function User ({ host, onClick, hoverIcon, reaction, muted, me, s
         { (muted || me || reaction || host) && (
           <div className="dot">
             {muted && <FiMicOff />}
-            {host && <CgCrown/>}
-            {!host && me && !muted && <FiUser />}
+            {host && !me && <CgCrown/>}
+            {me && !muted && <FiUser />}
             {reaction && `${reaction}`}
           </div>
         )}

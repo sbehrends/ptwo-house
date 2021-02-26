@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/router'
 import dynamic from 'next/dynamic'
 
@@ -17,11 +17,14 @@ export default function RoomPage() {
   const [userName, setUserName] = useState('')
   const [willingToConnect, setWillingToConnect] = useState(false)
 
+  const audioEl = useRef()
+
   const {
     roomId,
   } = router.query
 
   function joinRoom() {
+    audioEl.current.play()
     setWillingToConnect(true)
     return
   }
@@ -35,6 +38,7 @@ export default function RoomPage() {
             <div>
               <Input placeholder="Name" onChange={e => setUserName(e.target.value)} />
             </div>
+            <audio style={{display: 'none'}} ref={audioEl} src="/silence.mp3" controls/>
             <div>
             <Button fullWidth onClick={joinRoom}>Join Room</Button>
             </div>
