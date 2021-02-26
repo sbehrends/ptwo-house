@@ -8,6 +8,7 @@ import User from './User'
 import Heading from './Heading'
 import Container from './Container'
 import { StreamContext } from '../contexts/StreamContext'
+import useRoomEvents from '../hooks/useRoomEvents'
 
 export default function StreamPlayer() {
   const {
@@ -38,6 +39,8 @@ export default function StreamPlayer() {
     startMicStream,
   } = useContext(StreamContext)
 
+  const [recentEvents, roomEvents] = useRoomEvents()
+
   const speakers = useMemo(() => {
     console.log(peerList, incomingStreams)
     return peerList
@@ -65,6 +68,11 @@ export default function StreamPlayer() {
       })
   }, [peerList])
 
+  const reactions = useMemo(() => {
+    return recentEvents
+      .filter(({eventName}) => eventName === 'reaction')
+  }, [recentEvents])
+
   return (<>
       <Container>
         <Heading size={2}>Speakers ({speakers.length})</Heading>
@@ -79,6 +87,7 @@ export default function StreamPlayer() {
             me={speaker.peer === peerId}
             stream={speaker.stream}
             onClick={(connRole === 'host' && !speaker?.metadata?.isHost) ? () => {onDemotePeerToListener(speaker.peer)} : null }
+            reaction={reactions.find(({peer: peerId}) => peerId === speaker?.peer)?.eventContent}
             hoverIcon={<FiX/>}
           />
         ))}

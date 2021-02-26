@@ -7,14 +7,13 @@ function getLatestEvents (events = [], secs) {
     .filter(({date}) => now - date < secs)
 }
 
-export default function useRoomEvents(timeLimit = 60, limit) {
+export default function useRoomEvents(timeLimit = 15, limit) {
   const [lastUpdate, setLastUpdate] = useState(0)
   const {
     state: {
       roomEvents,
     },
   } = useContext(PeerContext)
-  console.log('dsadsa', roomEvents)
   
   const recentEvents = getLatestEvents(roomEvents, timeLimit)
 

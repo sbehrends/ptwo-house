@@ -123,7 +123,6 @@ function Main ({ user }) {
   return (
     <>
       <Container>
-        {peerStatus}
         <Heading>
           {roomMetadata.title}
         </Heading>
@@ -138,7 +137,7 @@ function Main ({ user }) {
             { !micMuted && <FiMic/>}
           </Button>
         )}
-        <Button style={{marginLeft:10}} outline contrast onClick={handleReaction}>🙋‍♀️</Button>
+        {!isHost && <Button style={{marginLeft:10}} outline contrast onClick={handleReaction}>🙋‍♀️</Button>}
       </ActionGroup>
     </>
   )

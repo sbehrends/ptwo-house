@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useMemo } from 'react'
 
 import { RiWhatsappLine, RiTelegramLine, RiLinksFill } from 'react-icons/ri'
 import { FiX, FiPlus } from 'react-icons/fi'
@@ -7,6 +7,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard'
 
 
 import { PeerContext } from '../contexts/PeerJSContext'
+import useRoomEvents from '../hooks/useRoomEvents'
 import User from './User'
 import Heading from './Heading'
 import Container from './Container'
@@ -24,6 +25,8 @@ export default function ConnectedPeersList({ shareLink }) {
     },
   } = useContext(PeerContext)
 
+  const [recentEvents, roomEvents] = useRoomEvents()
+
   const listenersPeers = peerList
     .filter(peer => !peer.metadata.isSpeaker)
 
@@ -33,6 +36,11 @@ export default function ConnectedPeersList({ shareLink }) {
     if (!isHost) return
     onPromotePeerToSpeaker(peer.peer)
   }
+
+  const reactions = useMemo(() => {
+    return recentEvents
+      .filter(({eventName}) => eventName === 'reaction')
+  }, [recentEvents])
 
   return (
     <>
@@ -49,6 +57,7 @@ export default function ConnectedPeersList({ shareLink }) {
             name={peer.metadata?.user?.name || 'Anonym'}
             onClick={isHost ? () => handleUserClick(peer) : null}
             hoverIcon={<FiPlus/>}
+            reaction={reactions.find(({peer: peerId}) => peerId === peer.peer)?.eventContent}
           />
         ))}
         <style jsx>{`

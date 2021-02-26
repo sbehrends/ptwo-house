@@ -37,14 +37,14 @@ export default function User ({ host, onClick, hoverIcon, reaction, muted, me, s
         <span>
           {getInitials(name)}
         </span>
-        { (muted || me || reaction || host) && (
+        { ((muted || me || host) && !reaction) && (
           <div className="dot">
             {muted && <FiMicOff />}
             {host && !me && <CgCrown/>}
             {me && !muted && <FiUser />}
-            {reaction && `${reaction}`}
           </div>
         )}
+        { reaction && <div className="dot">{reaction}</div>}
       </div>
       <div className="name">
         {name}
@@ -81,7 +81,7 @@ export default function User ({ host, onClick, hoverIcon, reaction, muted, me, s
           right: calc(var(--dot-size) / -2);
           bottom: calc(var(--dot-size) / -4);;
           color: var(--dark-bg);
-          text-indent: -3px;
+          text-indent: 3px;
 
           display: flex;
           justify-content: center;
