@@ -15,7 +15,7 @@ In no particular order
 - [] Allow others to Explore Rooms based on content
 - [x] Mute/Unmute as Speaker
 - [x] As host Promote listener to Speaker (Multi Speaker Room)
-  - [] As host Demote speaker
+  - [x] As host Demote speaker
 - [] As host kick listeners
 - [] As a listener raise hand (🙋‍♀️)
 - [] As a listener react to conversation (👍 👏 👋 ♥️ 💔)
