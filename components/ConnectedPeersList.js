@@ -1,22 +1,31 @@
 import { useContext } from 'react'
 
 import { RiWhatsappLine, RiTelegramLine, RiLinksFill } from 'react-icons/ri'
+import { FiX, FiPlus } from 'react-icons/fi'
 import { WhatsappShareButton, TelegramShareButton } from 'react-share'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 
 
-import { PeerContext } from '../contexts/PeerContext'
+import { PeerContext } from '../contexts/PeerJSContext'
 import User from './User'
 import Heading from './Heading'
 import Container from './Container'
 
 export default function ConnectedPeersList({ shareLink }) {
   const {
-    connectedPeers,
-    onPromotePeerToSpeaker,
-    isHost,
-    peerId,
+    state: {
+      peerId,
+      connRole,
+      peerList,
+      isHost,
+    },
+    actions: {
+      onPromotePeerToSpeaker,
+    },
   } = useContext(PeerContext)
+
+  const listenersPeers = peerList
+    .filter(peer => !peer.metadata.isSpeaker)
 
   const shareMessage = `Join my Room with this link`
 
@@ -29,12 +38,18 @@ export default function ConnectedPeersList({ shareLink }) {
     <>
       <Container>
         <Heading size={2}>
-          Listeners ({connectedPeers.length})
+          Listeners ({listenersPeers.length})
         </Heading>
       </Container>
       <div className="grid">
-        { connectedPeers.map(peer => (
-          <User key={peer.peer} highlight={peer.peer === peerId} name={peer.metadata?.name || 'Anonym'} onClick={() => handleUserClick(peer)} />
+        { listenersPeers.map(peer => (
+          <User
+            key={peer.peer}
+            me={peer.peer === peerId}
+            name={peer.metadata?.user?.name || 'Anonym'}
+            onClick={isHost ? () => handleUserClick(peer) : null}
+            hoverIcon={<FiPlus/>}
+          />
         ))}
         <style jsx>{`
           .grid {
@@ -43,6 +58,7 @@ export default function ConnectedPeersList({ shareLink }) {
             display: grid;
             grid-gap: 1rem;
             grid-template-columns: repeat(3, 1fr);
+            min-height: 96px;
           }
         `}</style>
       </div>

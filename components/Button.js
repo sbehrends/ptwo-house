@@ -45,7 +45,7 @@ export default function Button ({ as, contrast, success, big, fullWidth, outline
 
         .outline {
           background-color: transparent;
-          border: 2px solid var(--active-color);
+          box-shadow: 0 0 0 2px var(--active-color);
           color: var(--active-color);
         }
         .avoid {
@@ -62,7 +62,7 @@ export default function Button ({ as, contrast, success, big, fullWidth, outline
         }
         .contrast.outline {
           background-color: transparent;
-          border: 2px solid #000000;
+          box-shadow: 0 0 0 2px #000000;
           color: #000000;
         }
       `}</style>

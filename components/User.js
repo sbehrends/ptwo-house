@@ -2,6 +2,8 @@ import { useEffect, useState, useRef } from 'react'
 import hark from 'hark'
 import stc from 'string-to-color'
 import cc from 'classcat'
+import { FiUser, FiMicOff, FiX } from 'react-icons/fi'
+import { CgCrown } from 'react-icons/cg'
 
 const getInitials = function (string) {
   const names = `${string}`.trim().split(' ')
@@ -13,7 +15,7 @@ const getInitials = function (string) {
   return initials
 }
 
-export default function User ({ stream, name, highlight, ...props }) {
+export default function User ({ host, onClick, hoverIcon, reaction, muted, me, stream, name, highlight, ...props }) {
   const [speaking, setSpeaking] = useState(false)
 
   useEffect(() => {
@@ -23,19 +25,68 @@ export default function User ({ stream, name, highlight, ...props }) {
     speechEvents.on('speaking', () => setSpeaking(true))
     speechEvents.on('stopped_speaking', () => setSpeaking(false))
   }, [stream])
-  
+
   return (
     <div className="User" {...props}>
-      <div className={cc([{ speaking, highlight }, 'avatar'])} style={{backgroundColor: stc(name)}}>
+      <div className={cc([{ speaking, highlight }, 'avatar'])} style={{backgroundColor: stc(name)}} onClick={onClick}>
+        { onClick && hoverIcon && (
+          <div className="avatarAction">
+            { hoverIcon }
+          </div>
+        )}
         <span>
           {getInitials(name)}
         </span>
+        { (muted || me || reaction || host) && (
+          <div className="dot">
+            {muted && <FiMicOff />}
+            {host && !me && <CgCrown/>}
+            {me && !muted && <FiUser />}
+            {reaction && `${reaction}`}
+          </div>
+        )}
       </div>
       <div className="name">
         {name}
       </div>
       <style jsx>{`
         --avatar-size: 60px;
+        --dot-size: 30px;
+
+        .avatarAction {
+          position: absolute;
+          background: rgba(0,0,0,0.65);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border-radius: var(--avatar-size);
+          height: var(--avatar-size);
+          width: var(--avatar-size);
+          font-size: 28px;
+          opacity: 0;
+          transition: all 0.25s ease-in-out;
+          cursor: pointer;
+        }
+
+        .avatarAction:hover {
+          opacity: 1;
+        }
+
+        .dot {
+          position: absolute;
+          background: white;
+          width: var(--dot-size);
+          height: var(--dot-size);
+          border-radius: var(--dot-size);
+          right: calc(var(--dot-size) / -2);
+          bottom: calc(var(--dot-size) / -4);;
+          color: var(--dark-bg);
+          text-indent: -3px;
+
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
 
         .User {
           display: flex;
@@ -52,7 +103,7 @@ export default function User ({ stream, name, highlight, ...props }) {
 
         .avatar {
           background-color: #ccc;
-          border-radius: 50%;
+          border-radius: var(--avatar-size);
           height: var(--avatar-size);
           width: var(--avatar-size);
           text-align: center;
@@ -63,6 +114,7 @@ export default function User ({ stream, name, highlight, ...props }) {
           text-transform: uppercase;
           position: relative;
           color: var(--active-color);
+          position: relative;
         }
         
         .avatar.highlight {
