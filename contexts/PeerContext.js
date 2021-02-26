@@ -276,7 +276,7 @@ const PeerContextProvider = ({ children, initialContext }) => {
 
         // const incomingStreams = {
         //   ...incomingStreamsObjRef.current,
-        // }
+        // } 
         // incomingStreams[call.peer] = {
         //   call,
         //   audioStream,

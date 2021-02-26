@@ -1,77 +1,100 @@
-import { useRef, useContext, useEffect, useState } from 'react'
+import { useRef, useContext, useEffect, useState, useMemo } from 'react'
 import { FiX, FiPlus } from 'react-icons/fi'
 
-import { PeerContext } from '../contexts/PeerContext'
+import { PeerContext } from '../contexts/PeerJSContext'
 
 
 import User from './User'
+import Heading from './Heading'
+import Container from './Container'
+import { StreamContext } from '../contexts/StreamContext'
 
 export default function StreamPlayer() {
-  const { peer, incomingStreams, peerConnError, connRole, peerId, userName, onDemotePeerToListener, incomingStreamsObj } = useContext(PeerContext)
-  const [streams, setStreams] = useState([])
-  const playerEl = useRef([])
+  const {
+    // incomingStreams,
+    peerConnError,
+    // connRole,
+    // peerId,
+    userName,
+    // onDemotePeerToListener,
+    // incomingStreamsObj,
+    streams: {
+      incomingStreams,
+    },
+    state: {
+      peerList,
+      connRole,
+      peer,
+      peerId,
+    },
+    actions: {
+      onPromotePeerToSpeaker,
+      onDemotePeerToListener,
+    },
+  } = useContext(PeerContext)
 
-  // function playStream(stream) {
-  //   playerEl.current.srcObject = stream
-  //   playerEl.current.play()
-  // }
+  const {
+    micAudioStream,
+    startMicStream,
+  } = useContext(StreamContext)
 
+  const speakers = useMemo(() => {
+    console.log(peerList, incomingStreams)
+    return peerList
+      .filter(Boolean)
+      .filter(peer => peer.metadata.isSpeaker)
+      .map(peer => {
+        // Peer has stream
+        let stream
 
-  // useEffect(() => {
-  //   incomingStreams.forEach((call, i) => {
-  //     if (call.open) return
-  //     try {
-  //       call.answer();
-  //       call.on('stream', audioStream => {
-  //         setStreams([...streams, audioStream])
-  //         const audioObj = new Audio()
-  //         audioObj.srcObject = audioStream
-  //         audioObj.play()
-  //         // playerEl.current[i].srcObject = audioStream
-  //         // playerEl.current[i].play()
-  //       })
-  //     } catch(e) {
-  //       // debugger
-  //     }
-  //   })
-  // }, [incomingStreams])
+        const peerHasStream = incomingStreams
+          .find(call => call.call.peer === peer.peer)
 
-  return (
-    <div className="grid">
-      { peerConnError && <div>Error on connection</div> }
-      {/* { incomingStreams.map((stream, i) => (
-        <audio id={stream.connectionId} key={i} ref={el => (playerEl.current[i] = el)} controls autoPlay={true} />
-      ))} */}
-      { (connRole === 'host' || connRole === 'speaker') && <User host={connRole === 'host'} name={userName} me />}
-      { incomingStreamsObj.map(call => (
-        <User
-          key={call.call.peer}
-          name={call.call.metadata.name ? call.call.metadata.name : 'Anonym'}
-          stream={call.audioStream}
-          onClick={connRole === 'host' ? () => {onDemotePeerToListener(call.call.peer)} : null }
-          hoverIcon={<FiX/>}
-        />
-      ))}
-      {/* { incomingStreams.map((stream, i) => (
-        <User
-          key={i}
-          name={stream.metadata.name ? stream.metadata.name : 'Anonym'}
-          stream={streams[i]}
-          onClick={connRole === 'host' ? () => {onDemotePeerToListener(stream.peer)} : null }
-          hoverIcon={<FiX/>}
-        />
-      ))} */}
-      <style jsx>{`
-        .grid {
-          max-width: 1200px;
-          margin: 0 auto;
-          display: flex;
-          justify-content: center;
+        if (peerHasStream) {
+          stream = peerHasStream?.audioStream
         }
-        audio {
-          display: none;
+
+        if (peer.peer === peerId) {
+          stream = micAudioStream
         }
-      `}</style>
-    </div>
+
+        return {
+          ...peer,
+          stream, // TODO: Add incoming stream for animation
+        }
+      })
+  }, [peerList])
+
+  return (<>
+      <Container>
+        <Heading size={2}>Speakers ({speakers.length})</Heading>
+      </Container>
+      <div className="grid">
+        { peerConnError && <div>Error on connection</div> }
+        { speakers.map(speaker => (
+          <User
+            key={speaker?.peer}
+            name={speaker?.metadata?.user?.name ? speaker.metadata.user.name : 'Anonym'}
+            host={speaker?.metadata?.isHost}
+            me={speaker.peer === peerId}
+            stream={speaker.stream}
+            onClick={(connRole === 'host' && !speaker?.metadata?.isHost) ? () => {onDemotePeerToListener(speaker.peer)} : null }
+            hoverIcon={<FiX/>}
+          />
+        ))}
+        <style jsx>{`
+          .grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-evenly;
+            flex-wrap: wrap
+          }
+          audio {
+            display: none;
+          }
+        `}</style>
+      </div>
+    </>
   )
 }

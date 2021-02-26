@@ -2,10 +2,14 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import uuid from 'uuid-random'
 
+import { FiX, FiPhoneIncoming, FiPlus } from 'react-icons/fi'
+
 import Layout from '../components/Layout'
 import Button from '../components/Button'
 import Input from '../components/Input'
 import Heading from '../components/Heading'
+
+import User from '../components/User'
 
 export default function Index () {
   const router = useRouter()
@@ -27,16 +31,10 @@ export default function Index () {
   }
 
   useEffect(() => {
-    navigator.permissions.query(
+    navigator.permissions?.query(
       { name: 'microphone' }
     ).then(function(permissionStatus){
-    
-        console.log(permissionStatus.state); // granted, denied, prompt
         setMicAccess(permissionStatus.state)
-    
-        permissionStatus.onchange = function(){
-            console.log("Permission changed to " + this.state);
-        }
     })
   }, [])
 
