@@ -112,6 +112,7 @@ function Main ({ user }) {
   return (
     <>
       <Container>
+        {peerStatus}
         <Heading>
           {roomMetadata.title}
         </Heading>
