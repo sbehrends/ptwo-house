@@ -6,6 +6,8 @@ import uuid from 'uuid-random'
 import useStateRef from '../libs/useStateRef'
 
 import { PeerContextProvider, PeerContext } from '../contexts/PeerJSContext'
+import { StreamContextProvider } from '../contexts/StreamContext'
+import useRoomEvents from '../hooks/useRoomEvents'
 
 function Debug ({ name }) {
   const {
@@ -21,6 +23,7 @@ function Debug ({ name }) {
       connectedPeers,
       peersOnRoom,
       peerList,
+      // roomEvents,
     },
     streams: {
       incomingStreams,
@@ -29,9 +32,12 @@ function Debug ({ name }) {
     actions: {
       onPromotePeerToSpeaker,
       onDemotePeerToListener,
+      sendMessageToHost,
       // reconnectToHost,
     }
   } = useContext(PeerContext)
+
+  const [recentEvents, roomEvents] = useRoomEvents()
 
   const [hostId, setHostId] = useState(roomId)
   const [outgoingConn, setOutgoingConn, outgoingConnRef] = useStateRef([])
@@ -41,6 +47,13 @@ function Debug ({ name }) {
     incomingStreams.forEach(({call}, i) => {
       // console.log(call)
       call.close()
+    })
+  }
+
+  function handleReaction () {
+    sendMessageToHost({
+      action: 'sendReaction',
+      payload: '🙋‍♀️',
     })
   }
 
@@ -63,6 +76,13 @@ function Debug ({ name }) {
             {peer.peer} {peer.connectionId}
             <button onClick={() => initializeStreamToPeer(peer.peer)}>Call</button>
           </li>
+        ))}
+      </ul>
+      <h4>Events</h4>
+      <button onClick={handleReaction}>React</button>
+      <ul>
+        {recentEvents.map(event => (
+          <li key={event.id}>{JSON.stringify(event)}</li>
         ))}
       </ul>
       <h4>Peers in Room {roomMetadata?.title || ''}</h4>
@@ -98,6 +118,7 @@ export default function DebugMain () {
   const roomId = uuid()
   return (
     <div style={{display: 'flex', justifyContent: 'space-around'  }}>
+      <StreamContextProvider>
       <PeerContextProvider initialContext={{
         isHost: true,
         roomId,
@@ -110,6 +131,8 @@ export default function DebugMain () {
       }}>
         <Debug name="Host" />
       </PeerContextProvider>
+      </StreamContextProvider>
+      <StreamContextProvider>
       <PeerContextProvider initialContext={{
         isHost: false,
         roomId,
@@ -119,6 +142,8 @@ export default function DebugMain () {
       }}>
         <Debug name="B" />
       </PeerContextProvider>
+      </StreamContextProvider>
+      <StreamContextProvider>
       <PeerContextProvider initialContext={{
         isHost: false,
         roomId,
@@ -128,6 +153,7 @@ export default function DebugMain () {
       }}>
         <Debug name="C" />
       </PeerContextProvider>
+      </StreamContextProvider>
     </div>
   )
 }

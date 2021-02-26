@@ -70,6 +70,7 @@ function Main ({ user }) {
     actions: {
       onPromotePeerToSpeaker,
       onDemotePeerToListener,
+      sendMessageToHost,
       // reconnectToHost,
     }
   } = useContext(PeerContext)
@@ -82,9 +83,12 @@ function Main ({ user }) {
   const shareLink = typeof window === 'undefined' ? '' : `${window.location.protocol || ''}//${window.location.host || ''}/room/${roomId}`
 
   async function onLeave() {
-    if (!isHost) return router.push('/')
-    const agree =  confirm('As a host, when you quit the room all listeners will be disconnected')
-    if (agree) router.push('/')
+    if (isHost) {
+      const agree =  confirm('As a host, when you quit the room all listeners will be disconnected')
+      if (!agree) return
+    }
+    connToHost.close()
+    router.push('/')
   }
 
   /* if (`${peerConnError}`.includes('Could not connect to peer')) {
@@ -109,6 +113,13 @@ function Main ({ user }) {
     )
   } */
 
+  function handleReaction () {
+    sendMessageToHost({
+      action: 'sendReaction',
+      payload: '🙋‍♀️',
+    })
+  }
+
   return (
     <>
       <Container>
@@ -126,6 +137,7 @@ function Main ({ user }) {
             { !micMuted && <FiMic/>}
           </Button>
         )}
+        <Button style={{marginLeft:10}} outline contrast onClick={handleReaction}>🙋‍♀️</Button>
       </ActionGroup>
     </>
   )

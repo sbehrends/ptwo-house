@@ -17,7 +17,6 @@ export default function Button ({ as, contrast, success, big, fullWidth, outline
           transition: 0.3s;
           white-space: nowrap;
           outline: none;
-          transition: 0.3s;
           opacity: 0.85;
           text-decoration: none;
         }
