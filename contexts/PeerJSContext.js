@@ -314,7 +314,6 @@ export const PeerContextProvider = ({ children, initialContext }) => {
 
     setPeerListenersInitialized(true)
   }, [peer])
-  
 
   const peerList = useMemo(() => {
     if (isHost) {

@@ -23,7 +23,6 @@ function Debug ({ name }) {
       connectedPeers,
       peersOnRoom,
       peerList,
-      // roomEvents,
     },
     streams: {
       incomingStreams,
@@ -38,7 +37,6 @@ function Debug ({ name }) {
   } = useContext(PeerContext)
 
   const [recentEvents, roomEvents] = useRoomEvents()
-
   const [hostId, setHostId] = useState(roomId)
   const [outgoingConn, setOutgoingConn, outgoingConnRef] = useStateRef([])
 
@@ -56,7 +54,6 @@ function Debug ({ name }) {
       payload: '🙋‍♀️',
     })
   }
-
   return (
     <div>
       <h3>{name}</h3>
@@ -119,40 +116,40 @@ export default function DebugMain () {
   return (
     <div style={{display: 'flex', justifyContent: 'space-around'  }}>
       <StreamContextProvider>
-      <PeerContextProvider initialContext={{
-        isHost: true,
-        roomId,
-        user: {
-          name: 'Host'
-        },
-        roomMetadata: {
-          title: 'Debug Room',
-        },
-      }}>
-        <Debug name="Host" />
-      </PeerContextProvider>
+        <PeerContextProvider initialContext={{
+          isHost: true,
+          roomId,
+          user: {
+            name: 'Host'
+          },
+          roomMetadata: {
+            title: 'Debug Room',
+          },
+        }}>
+          <Debug name="Host" />
+        </PeerContextProvider>
       </StreamContextProvider>
       <StreamContextProvider>
-      <PeerContextProvider initialContext={{
-        isHost: false,
-        roomId,
-        user: {
-          name: 'B'
-        }
-      }}>
-        <Debug name="B" />
-      </PeerContextProvider>
+        <PeerContextProvider initialContext={{
+          isHost: false,
+          roomId,
+          user: {
+            name: 'B'
+          }
+        }}>
+          <Debug name="B" />
+        </PeerContextProvider>
       </StreamContextProvider>
       <StreamContextProvider>
-      <PeerContextProvider initialContext={{
-        isHost: false,
-        roomId,
-        user: {
-          name: 'C'
-        }
-      }}>
-        <Debug name="C" />
-      </PeerContextProvider>
+        <PeerContextProvider initialContext={{
+          isHost: false,
+          roomId,
+          user: {
+            name: 'C'
+          }
+        }}>
+          <Debug name="C" />
+        </PeerContextProvider>
       </StreamContextProvider>
     </div>
   )

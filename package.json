@@ -12,6 +12,10 @@
   "author": "Sergio Behrends <sergio@behrends.com.ar>",
   "license": "MIT",
   "dependencies": {
+    "@sentry/browser": "^6.2.0",
+    "@sentry/integrations": "^6.2.0",
+    "@sentry/node": "^6.2.0",
+    "@sentry/webpack-plugin": "^1.14.1",
     "classcat": "^4.1.0",
     "hark": "^1.2.3",
     "next": "^10.0.6",
