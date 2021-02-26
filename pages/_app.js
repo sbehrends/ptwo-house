@@ -1,4 +1,4 @@
-import { init } from '../utils/sentry'
+import { init } from '../libs/sentry'
 
 init()
 
