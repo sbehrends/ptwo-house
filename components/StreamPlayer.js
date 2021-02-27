@@ -42,7 +42,6 @@ export default function StreamPlayer() {
   const [recentEvents, roomEvents] = useRoomEvents()
 
   const speakers = useMemo(() => {
-    console.log(peerList, incomingStreams)
     return peerList
       .filter(Boolean)
       .filter(peer => peer.metadata.isSpeaker)
