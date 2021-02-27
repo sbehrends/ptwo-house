@@ -1,10 +1,10 @@
 import cc from 'classcat'
 
-export default function Button ({ as, contrast, success, big, fullWidth, outline, avoid, children, className, ...props }) {
+export default function Button ({ as, small, contrast, success, big, fullWidth, outline, avoid, children, className, ...props }) {
   const ButtonEl = as ? as : 'button'
 
   return (
-    <ButtonEl className={cc([{ contrast, success, big, fullWidth, outline, avoid, disabled: props.disabled }, className, 'Button'])} {...props}>
+    <ButtonEl className={cc([{ small, contrast, success, big, fullWidth, outline, avoid, disabled: props.disabled }, className, 'Button'])} {...props}>
       {children}
       <style jsx>{`
         .Button {
@@ -35,6 +35,10 @@ export default function Button ({ as, contrast, success, big, fullWidth, outline
 
         .fullWidth {
           width: 100%;
+        }
+
+        .small {
+          padding: 8px 12px;
         }
 
         .big {

@@ -11,6 +11,7 @@ export default function Action ({ children }) {
           border-radius: 14px;
           padding: 20px;
           background: var(--active-color);
+          display: flex;
         }
       `}</style>
     </div>

@@ -128,10 +128,10 @@ function Main ({ user }) {
     )
   } */
 
-  function handleReaction () {
+  function handleReaction (emoji) {
     sendMessageToHost({
       action: 'sendReaction',
-      payload: '🙋‍♀️',
+      payload: emoji,
     })
   }
 
@@ -152,7 +152,9 @@ function Main ({ user }) {
             { !micMuted && <FiMic/>}
           </Button>
         )}
-        {!isHost && <Button style={{marginLeft:10}} outline contrast onClick={handleReaction}>🙋‍♀️</Button>}
+        {!isHost && <Button style={{marginLeft:10}} small outline contrast onClick={() => handleReaction('🙋‍♀️')}>🙋‍♀️</Button>}
+        {!isHost && <Button style={{marginLeft:10}} small outline contrast onClick={() => handleReaction('👍')}>👍</Button>}
+        {!isHost && <Button style={{marginLeft:10}} small outline contrast onClick={() => handleReaction('👎')}>👎</Button>}
       </ActionGroup>
     </>
   )

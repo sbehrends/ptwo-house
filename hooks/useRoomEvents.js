@@ -4,6 +4,7 @@ import { PeerContext } from '../contexts/PeerJSContext'
 function getLatestEvents (events = [], secs) {
   const now = +new Date() / 1000
   return events
+    .sort((a,b) => b.date - a.date)
     .filter(({date}) => now - date < secs)
 }
 
