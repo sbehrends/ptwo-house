@@ -373,7 +373,7 @@ export const PeerContextProvider = ({ children, initialContext }) => {
         onPromotePeerToSpeaker,
         onDemotePeerToListener,
         sendMessageToHost,
-        // reconnectToHost,
+        reconnectToHost,
       }
     }}>
       {children}

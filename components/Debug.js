@@ -32,7 +32,7 @@ function Debug ({ name }) {
       onPromotePeerToSpeaker,
       onDemotePeerToListener,
       sendMessageToHost,
-      // reconnectToHost,
+      reconnectToHost,
     }
   } = useContext(PeerContext)
 
@@ -41,11 +41,22 @@ function Debug ({ name }) {
   const [outgoingConn, setOutgoingConn, outgoingConnRef] = useStateRef([])
 
   const disconnect = () => {
-    connToHost.close()
-    incomingStreams.forEach(({call}, i) => {
-      // console.log(call)
-      call.close()
-    })
+    if (connToHost) connToHost.close()
+    if (connectedPeers) {
+      connectedPeers.forEach(conn => {
+        conn.close()
+      })
+    }
+    if (outgoingStreams) {
+      outgoingStreams.forEach(conn => {
+        conn.close()
+      })
+    }
+    if (incomingStreams) {
+      incomingStreams.forEach(conn => {
+        conn.call.close()
+      })
+    }
   }
 
   function handleReaction () {
@@ -83,9 +94,8 @@ function Debug ({ name }) {
         ))}
       </ul>
       <h4>Peers in Room {roomMetadata?.title || ''}</h4>
-      { !isHost && connToHost && <button onClick={disconnect}>Close</button>}
+      <button onClick={disconnect}>Close</button>
       { !isHost && !connToHost && <button onClick={() => reconnectToHost()}>Connect</button>}
-
       <ul>
         {peerList.map((peer, i) => (
           <li key={peer.peer}>

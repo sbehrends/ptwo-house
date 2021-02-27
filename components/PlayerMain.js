@@ -87,7 +87,22 @@ function Main ({ user }) {
       const agree =  confirm('As a host, when you quit the room all listeners will be disconnected')
       if (!agree) return
     }
-    connToHost.close()
+    if (connToHost) connToHost.close()
+    if (connectedPeers) {
+      connectedPeers.forEach(conn => {
+        conn.close()
+      })
+    }
+    if (outgoingStreams) {
+      outgoingStreams.forEach(conn => {
+        conn.close()
+      })
+    }
+    if (incomingStreams) {
+      incomingStreams.forEach(conn => {
+        conn.close()
+      })
+    }
     router.push('/')
   }
 
