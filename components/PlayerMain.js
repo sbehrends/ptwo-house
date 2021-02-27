@@ -100,7 +100,7 @@ function Main ({ user }) {
     }
     if (incomingStreams) {
       incomingStreams.forEach(conn => {
-        conn.close()
+        conn.call.close()
       })
     }
     router.push('/')
