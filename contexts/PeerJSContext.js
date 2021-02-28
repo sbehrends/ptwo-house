@@ -356,10 +356,10 @@ export const PeerContextProvider = ({ children, initialContext }) => {
     if (!isHost) return
     const update = setInterval(() => {
       updateRoom(roomId, {
-        users: (connectedPeers.length + 1) || 1, // +1 to include self
+        users: (connectedPeersRef.current.length + 1), // +1 to include self
         lastPing: serverTimestamp()
       })
-    }, 5000)
+    }, 10000)
     return () => {
       clearInterval(update)
     }

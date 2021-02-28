@@ -49,7 +49,7 @@ export default function Index () {
     const now = +new Date() / 1000
     return rooms
       .filter(room => room.lastPing)
-      .filter(room => now - room.lastPing.seconds < 120)
+      .filter(room => now - room.lastPing.seconds < 30)
   }, [rooms])
 
   function createRoom() {
