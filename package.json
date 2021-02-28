@@ -17,6 +17,7 @@
     "@sentry/node": "^6.2.0",
     "@sentry/webpack-plugin": "^1.14.1",
     "classcat": "^4.1.0",
+    "firebase": "^8.2.9",
     "hark": "^1.2.3",
     "next": "^10.0.6",
     "peerjs": "^1.3.1",
