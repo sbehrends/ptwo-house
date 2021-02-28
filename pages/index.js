@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/router'
 import uuid from 'uuid-random'
 
@@ -11,12 +11,17 @@ import Heading from '../components/Heading'
 
 import User from '../components/User'
 
+import { createRoom as dbCreateRoom, useFirestoreRooms } from '../hooks/useFirestore'
+import RoomList from '../components/RoomList'
+
 export default function Index () {
   const router = useRouter()
   const [userName, setUserName] = useState('')
   const [roomName, setRoomName] = useState('')
   const [roomIdToJoin, setRoomIdToJoin] = useState('')
   const [micAccess, setMicAccess] = useState(false)
+
+  const [rooms] = useFirestoreRooms()
 
   function requestMicAccess() {
     navigator.mediaDevices.getUserMedia({
@@ -33,13 +38,27 @@ export default function Index () {
   useEffect(() => {
     navigator.permissions?.query(
       { name: 'microphone' }
-    ).then(function(permissionStatus){
+    )
+    .then(function(permissionStatus){
         setMicAccess(permissionStatus.state)
     })
+    .catch(() => {})
   }, [])
+
+  const exploreRooms = useMemo(() => {
+    const now = +new Date() / 1000
+    return rooms
+      .filter(room => room.lastPing)
+      .filter(room => now - room.lastPing.seconds < 30)
+  }, [rooms])
 
   function createRoom() {
     const roomId = uuid()
+    dbCreateRoom(roomId, {
+      roomId,
+      roomName,
+      userName,
+    })
     router.push({
       pathname: '/cast/[roomId]',
       as: `/cast/${roomId}`,
@@ -75,13 +94,11 @@ export default function Index () {
           <Button outline={micAccess !== 'granted'} disabled={micAccess !== 'granted'} big fullWidth onClick={createRoom}>Create Room</Button>
         </div>
         <div className="spacing" style={{marginTop: 30}}>
-          <Heading size={2}>Join Room</Heading>
-          <div>
-            <Input placeholder="Room Id" onChange={e => setRoomIdToJoin(e.target.value)} />
-          </div>
-          <div>
-          <Button fullWidth onClick={joinRoom}>Join Room</Button>
-          </div>
+          <Heading size={2}>Latest Rooms</Heading>
+          {exploreRooms.length === 0 && (
+            <div>No rooms available</div>
+          )}
+          <RoomList rooms={exploreRooms} />
         </div>
       </div>
       <style jsx>{`
