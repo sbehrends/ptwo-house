@@ -12,6 +12,9 @@ import Input from '../components/Input'
 import Heading from '../components/Heading'
 import RoomList from '../components/RoomList'
 
+import { createRoom as dbCreateRoom, useFirestoreRooms } from '../hooks/useFirestore'
+import RoomList from '../components/RoomList'
+
 export default function Index () {
   const router = useRouter()
   const [userName, setUserName] = useState('')
