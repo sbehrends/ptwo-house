@@ -3,8 +3,9 @@ import { firebase } from '../libs/firebase'
 
 import config from '../config'
 export const serverTimestamp = firebase.firestore.FieldValue.serverTimestamp
+let db
 try {
-  const db = firebase.firestore()
+  db = firebase.firestore()
 } catch (e) {
   // Do nothing
 }
