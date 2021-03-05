@@ -39,9 +39,9 @@ export default function PlayerMain ({ roomId, roomName, userName, isHost }) {
 function Main ({ user }) {
   const router = useRouter()
 
-  // if (!user.name) {
-  //   router.push('/')
-  // }
+  if (!user.name) {
+    router.push('/')
+  }
 
   const {
     muteToggle,
@@ -106,13 +106,13 @@ function Main ({ user }) {
     router.push('/')
   }
 
-  /* if (`${peerConnError}`.includes('Could not connect to peer')) {
+  if (peerStatus === 'error') {
     return (
       <Container>
         <div>
           <FiAlertTriangle size={62} />
           <Heading size={2}>Error</Heading>
-          <p>Could not connect to peer</p>
+          <p>Could not connect to room</p>
           <Link href="/" passHref>
             <Button as="a">Go Back</Button>
           </Link>
@@ -126,7 +126,7 @@ function Main ({ user }) {
         `}</style>
       </Container>
     )
-  } */
+  }
 
   function handleReaction (emoji) {
     sendMessageToHost({
