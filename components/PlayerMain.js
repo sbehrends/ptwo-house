@@ -106,13 +106,15 @@ function Main ({ user }) {
     router.push('/')
   }
 
-  /* if (`${peerConnError}`.includes('Could not connect to peer')) {
+  console.log(peerStatus)
+
+  if (peerStatus === 'error') {
     return (
       <Container>
         <div>
           <FiAlertTriangle size={62} />
           <Heading size={2}>Error</Heading>
-          <p>Could not connect to peer</p>
+          <p>Could not connect to room</p>
           <Link href="/" passHref>
             <Button as="a">Go Back</Button>
           </Link>
@@ -126,7 +128,7 @@ function Main ({ user }) {
         `}</style>
       </Container>
     )
-  } */
+  }
 
   function handleReaction (emoji) {
     sendMessageToHost({
