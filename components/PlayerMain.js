@@ -39,9 +39,9 @@ export default function PlayerMain ({ roomId, roomName, userName, isHost }) {
 function Main ({ user }) {
   const router = useRouter()
 
-  // if (!user.name) {
-  //   router.push('/')
-  // }
+  if (!user.name) {
+    router.push('/')
+  }
 
   const {
     muteToggle,
@@ -105,8 +105,6 @@ function Main ({ user }) {
     }
     router.push('/')
   }
-
-  console.log(peerStatus)
 
   if (peerStatus === 'error') {
     return (

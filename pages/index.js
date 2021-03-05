@@ -16,6 +16,7 @@ export default function Index () {
   const router = useRouter()
   const [userName, setUserName] = useState('')
   const [roomName, setRoomName] = useState('')
+  const [createFormError, setCreateFormError] = useState(false)
   const [micAccess, setMicAccess] = useState(false)
 
   const [rooms] = useFirestoreRooms()
@@ -49,7 +50,21 @@ export default function Index () {
       .filter(room => now - room.lastPing.seconds < 30)
   }, [rooms])
 
+  function validForm () {
+    if (userName.trim().length < 3) {
+      setCreateFormError('Name must be longer than 3 characters')
+      return false
+    }
+    if (roomName.trim().length < 3) {
+      setCreateFormError('Room Title must be longer than 3 characters')
+      return false
+    }
+    setCreateFormError(false)
+    return true
+  }
+
   function createRoom() {
+    if (!validForm()) return
     const roomId = uuid()
     dbCreateRoom(roomId, {
       roomId,
@@ -80,6 +95,9 @@ export default function Index () {
             <Input placeholder="Room Title" onChange={e => setRoomName(e.target.value)} />
           </div>
         </div>
+        { createFormError && (
+          <div className="error">{createFormError}</div>
+        )}
         <div style={{marginTop: 20}}>
           <Button success={micAccess === 'granted'} disabled={micAccess === 'granted'} fullWidth onClick={requestMicAccess}>Allow Microphone Access</Button>
         </div>
@@ -99,6 +117,11 @@ export default function Index () {
       <style jsx>{`
             .spacing > * {
               margin-top: 10px;
+            }
+            .error {
+              font-size: 12px;
+              text-align: center;
+              margin: 6px 0;
             }
           `}</style>
     </Layout>
