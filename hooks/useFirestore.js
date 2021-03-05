@@ -1,10 +1,16 @@
 import { useState, useEffect } from 'react'
 import { firebase } from '../libs/firebase'
 
-export const db = firebase.firestore()
+import config from '../config'
 export const serverTimestamp = firebase.firestore.FieldValue.serverTimestamp
+try {
+  const db = firebase.firestore()
+} catch (e) {
+  // Do nothing
+}
 
 export function createRoom(id, data) {
+  if (!config.firebase.enabled) return
   return db
     .collection('rooms')
     .doc(id)
@@ -17,7 +23,7 @@ export function createRoom(id, data) {
 }
 
 export function updateRoom(id, data) {
-  console.log('Will update room status', id, data)
+  if (!config.firebase.enabled) return
   return db
     .collection('rooms')
     .doc(id)
@@ -29,6 +35,7 @@ export function updateRoom(id, data) {
 export function useFirestoreRooms () {
 
   const [rooms, setRooms] = useState([])
+  if (!config.firebase.enabled) return [rooms]
 
   useEffect(() => {
     const unsubscribe = db

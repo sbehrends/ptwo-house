@@ -28,7 +28,7 @@ export default function RoomPage() {
     setWillingToConnect(true)
     return
   }
-  
+
   return (
     <Layout>
       { !willingToConnect && (
